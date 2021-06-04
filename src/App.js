@@ -1,18 +1,23 @@
-import React, { Component } from 'react';
+import React, {useState, useEffect} from 'react';
+import Search from './components/Search/Search';
 
-class App extends Component {
-  render() {
-    return (
-      <div>
-        <div>
-          <h2>Hello world</h2>
-        </div>
-        <p>
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
-    );
+function App(){
+  const [query, setQuery] = useState('');
+  const [suggestions, setSuggestions] = useState([]);
+
+const findSuggestions = async (userInput) => {
+  if(userInput.length >= 2){
+    const result = await fetch(`http://localhost:4000/search?q=${userInput}`).then(res => res.json());
+    const filterResults = result.suggestions.filter(({searchterm}) => searchterm.includes(userInput));
+    return setSuggestions(filterResults);
   }
+}
+  
+  useEffect(()=>{
+      findSuggestions(query);
+  }, [query])
+
+    return <Search query={query} setQuery={setQuery} suggestions={suggestions}/>;
 }
 
 export default App;
